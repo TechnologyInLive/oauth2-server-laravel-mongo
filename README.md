@@ -38,7 +38,7 @@ if(gettype($userId)=='array'){
     throw new Exception\InvalidCredentialsException();
 }
 ```
-In **vendor/league/oauth2-server/src/Grant/PasswordGrant.php**
+In **vendor/league/oauth2-server/src/Grant/PasswordGrant.php** line 129 aprox
 
 
 The code on which this package is [based](https://github.com/lucadegasperi/oauth2-server-laravel)
