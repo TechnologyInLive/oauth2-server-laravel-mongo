@@ -8,7 +8,7 @@
  * @licence   http://mit-license.org/
  * @link      https://github.com/lucadegasperi/oauth2-server-laravel
  */
-//LALALALALALAL
+
 namespace LucaDegasperi\OAuth2Server\Storage;
 
 use Illuminate\Database\ConnectionResolverInterface as Resolver;

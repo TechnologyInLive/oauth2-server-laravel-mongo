@@ -78,14 +78,52 @@ return [
         'password' => [
             'class' => '\League\OAuth2\Server\Grant\PasswordGrant',
             'callback' => function($username, $password) {
-                //@TODO: cambiar el Auth por una consulta a users y ver si cuadra username y pass
-                if (Auth::attempt(["username" => $username, "password" => $password])) {
-                    $client_id = Auth::user()->_id;
-                    Auth::logout();
-                    return $client_id;
+                // Check for institution
+                if (Input::has('institution')) {
+                    // Admin institution?
+                    if (Input::get('institution')=='TILD') {
+                        // Search for Admin user
+                        $user = DB::table('users')
+                                ->where('username',$username)
+                                ->where('institution','TILD')
+                                ->first();
+                    } else {
+                        // Search institution
+                        $institution = Institution::where('code',Input::get('institution'))->first()->_id;
+                        // Search for user in institution
+                        $user = DB::table('users')
+                                ->where('username',$username)
+                                ->where('institution',$institution)
+                                ->first();
+                    }
+                    // Did we find the user?
+                    if (empty($user)) {
+                        return false;
+                    } else {
+                        // Check user password
+                        if(Hash::check($password,$user['password'])){
+                            // Return user id
+                            return $user['_id']->{'$id'};
+                        }else{
+                            return false;
+                        }
+                    }  
                 } else {
-                    return false;
+                    return array(
+                        'error' => Lang::get('errors.code.institution'),
+                        'desc' => Lang::get('errors.desc.institution')
+                        );
                 }
+                /**
+                *Original Code
+                *if (Auth::attempt(["username" => $username, "password" => $password])) {
+                *    $client_id = Auth::user()->_id;
+                *    Auth::logout();
+                *    return $client_id;
+                *} else {
+                *    return false;
+                *}
+                */
             },
             'access_token_ttl' => 3600
         ]
