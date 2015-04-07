@@ -81,19 +81,19 @@ return [
                 // Check for institution
                 if (Input::has('institution')) {
                     // Admin institution?
-                    if (Input::get('institution')=='TILD') {
+                    if (Input::get('institution') == 'TILD') {
                         // Search for Admin user
                         $user = DB::table('users')
-                                ->where('username',$username)
-                                ->where('institution','TILD')
+                                ->where('username', $username)
+                                ->where('institution', 'TILD')
                                 ->first();
                     } else {
                         // Search institution
-                        $institution = Institution::where('code',Input::get('institution'))->first()->_id;
+                        $institution = Institution::where('code', Input::get('institution'))->first()->_id;
                         // Search for user in institution
                         $user = DB::table('users')
-                                ->where('username',$username)
-                                ->where('institution',$institution)
+                                ->where('username', $username)
+                                ->where('institution', $institution)
                                 ->first();
                     }
                     // Did we find the user?
@@ -101,18 +101,16 @@ return [
                         return false;
                     } else {
                         // Check user password
-                        if(Hash::check($password,$user['password'])){
+                        if(Hash::check($password, $user['password'])){
                             // Return user id
                             return $user['_id']->{'$id'};
-                        }else{
+                        } else {
                             return false;
                         }
                     }  
                 } else {
-                    return array(
-                        'error' => Lang::get('errors.code.institution'),
-                        'desc' => Lang::get('errors.desc.institution')
-                        );
+                    // falta la institución (pero debemos devolver false o el oauth2 creerá que ha ido bien)
+                    return false;
                 }
                 /**
                 *Original Code
@@ -125,7 +123,12 @@ return [
                 *}
                 */
             },
-            'access_token_ttl' => 3600
+            'access_token_ttl' => 3600,
+        ],
+        'refresh_token' => [
+            'class' => '\League\OAuth2\Server\Grant\RefreshTokenGrant',
+            'access_token_ttl' => 3600,
+            'refresh_token_ttl' => 36000
         ]
     ],
 

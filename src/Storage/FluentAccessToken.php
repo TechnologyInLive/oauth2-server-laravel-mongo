@@ -33,7 +33,7 @@ class FluentAccessToken extends FluentAdapter implements AccessTokenInterface
         //         ->where('oauth_access_tokens.id', $token)
         //         ->first();
 
-        // end original code
+        // END original code
 
         $result = DB::table("oauth_access_tokens")
                     ->where("id", "=", $token)

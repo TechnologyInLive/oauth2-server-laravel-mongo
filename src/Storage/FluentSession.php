@@ -17,6 +17,8 @@ use League\OAuth2\Server\Entity\SessionEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use Carbon\Carbon;
 
+use Illuminate\Support\Facades\DB as DB;
+
 class FluentSession extends FluentAdapter implements SessionInterface
 {
     /**
@@ -46,11 +48,29 @@ class FluentSession extends FluentAdapter implements SessionInterface
      */
     public function getByAccessToken(AccessTokenEntity $accessToken)
     {
-        $result = $this->getConnection()->table('oauth_sessions')
-                ->select('oauth_sessions.*')
-                ->join('oauth_access_tokens', 'oauth_sessions.id', '=', 'oauth_access_tokens.session_id')
-                ->where('oauth_access_tokens.id', $accessToken->getId())
-                ->first();
+
+        // START original code
+
+        // $result = $this->getConnection()->table('oauth_sessions')
+        //         ->select('oauth_sessions.*')
+        //         ->join('oauth_access_tokens', 'oauth_sessions.id', '=', 'oauth_access_tokens.session_id')
+        //         ->where('oauth_access_tokens.id', $accessToken->getId())
+        //         ->first();
+
+        // END original code
+
+        $session = DB::table("oauth_access_tokens")
+                    ->where("id", "=", $accessToken->getId())
+                    ->first();
+        $result = DB::table("oauth_sessions")
+                    ->where("_id", "=", $session["session_id"])
+                    ->first();
+
+        // hack to cast the array of results to stdClass
+        if (!is_object($result) && !is_null($result)) {
+            $result = (object) $result;
+            $result->id = $result->_id;
+        }
 
         if (is_null($result)) {
             return null;

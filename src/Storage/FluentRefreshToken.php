@@ -15,6 +15,8 @@ use League\OAuth2\Server\Storage\RefreshTokenInterface;
 use League\OAuth2\Server\Entity\RefreshTokenEntity;
 use Carbon\Carbon;
 
+use Illuminate\Support\Facades\DB as DB;
+
 class FluentRefreshToken extends FluentAdapter implements RefreshTokenInterface
 {
     /**
@@ -24,9 +26,23 @@ class FluentRefreshToken extends FluentAdapter implements RefreshTokenInterface
      */
     public function get($token)
     {
-        $result = $this->getConnection()->table('oauth_refresh_tokens')
-                ->where('oauth_refresh_tokens.id', $token)
-                ->first();
+        
+        // START original code
+
+        // $result = $this->getConnection()->table('oauth_refresh_tokens')
+        //         ->where('oauth_refresh_tokens.id', $token)
+        //         ->first();
+
+        // END original code
+
+        $result = DB::table("oauth_refresh_tokens")
+                    ->where("id", "=", $token)
+                    ->first();
+
+        // hack to cast the array of results to stdClass
+        if (!is_object($result) && !is_null($result)) {
+            $result = (object) $result;
+        }
 
         if (is_null($result)) {
             return null;
