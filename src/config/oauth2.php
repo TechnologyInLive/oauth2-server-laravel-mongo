@@ -94,6 +94,7 @@ return [
                         $user = DB::table('users')
                                 ->where('username', $username)
                                 ->where('institution', $institution)
+                                ->where('deleted_at','=',null)
                                 ->first();
                     }
                     // Did we find the user?
