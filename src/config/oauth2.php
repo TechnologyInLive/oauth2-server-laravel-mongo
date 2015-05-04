@@ -80,16 +80,11 @@ return [
             'callback' => function($username, $password) {
                 // Check for institution
                 if (Input::has('institution')) {
-                    // Admin institution?
-                    if (Input::get('institution') == 'TILD') {
-                        $institution = 'TILD';
-                    } else {
-                        // Search institution
-                        $institution = Institution::where('code', Input::get('institution'))->first()->_id;
-                        // Did we find the institution?
-                        if (empty($institution)) {
-                            return false;
-                        }
+                    // Search institution
+                    $institution = Institution::where('code', Input::get('institution'))->first()->_id;
+                    // Did we find the institution?
+                    if (empty($institution)) {
+                        return false;
                     }
                     // Search for user
                         $user = DB::table('users')
