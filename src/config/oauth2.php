@@ -80,38 +80,47 @@ return [
             'callback' => function($username, $password) {
                 // Check for institution
                 if (Input::has('institution')) {
-                    // Search institution
-                    $institution = Institution::where('code', Input::get('institution'))->first();
-                    // Did we find the institution?
-                    if (empty($institution)) {
-                        return false;
-                    }
-                    // Search for user
+                    // Admin institution?
+                    if (Input::get('institution') == 'TILD') {
+                        // Search for Admin user
                         $user = DB::table('users')
                                 ->where('username', $username)
-                                ->where('institution', $institution->_id)
-                                ->where('deleted_at','=',null)
+                                ->where('institution', 'TILD')
                                 ->first();
-                    // Did we find the user?
-                    if (empty($user)) {
-                        return false;
                     } else {
-                        // Check user password
-                        if(Hash::check($password, $user['password'])){
-                            // Update last access
-                            DB::table('users')
-                                ->where('username', $username)
-                                ->where('institution', $institution->_id)
-                                ->where('deleted_at','=',null)
-                                ->update(array(
-                                            'last_access' => new MongoDate(strtotime(date("d-m-Y H:i")))
-                                            ));
-                            // Return user id
-                            return $user['_id']->{'$id'};
-                        } else {
+                        // Search institution
+                        $institution = Institution::where('code', Input::get('institution'))->first();
+                        // Did we find the institution?
+                        if (empty($institution)) {
                             return false;
                         }
-                    }  
+                        // Search for user
+                        $user = DB::table('users')
+                                    ->where('username', $username)
+                                    ->where('institution', $institution->_id)
+                                    ->where('deleted_at','=',null)
+                                    ->first();
+                        // Did we find the user?
+                        if (empty($user)) {
+                            return false;
+                        } else {
+                            // Check user password
+                            if (Hash::check($password, $user['password'])) {
+                                // Update last access
+                                DB::table('users')
+                                    ->where('username', $username)
+                                    ->where('institution', $institution->_id)
+                                    ->where('deleted_at','=',null)
+                                    ->update(array(
+                                                'last_access' => new MongoDate(strtotime(date("d-m-Y H:i")))
+                                            ));
+                                // Return user id
+                                return $user['_id']->{'$id'};
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
                 } else {
                     // falta la institución (pero debemos devolver false o el oauth2 creerá que ha ido bien)
                     return false;
