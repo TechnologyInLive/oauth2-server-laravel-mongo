@@ -80,28 +80,32 @@ return [
             'callback' => function($username, $password) {
                 // Check for institution
                 if (Input::has('institution')) {
-                    // Admin institution?
-                    if (Input::get('institution') == 'TILD') {
-                        // Search for Admin user
-                        $user = DB::table('users')
-                                ->where('username', $username)
-                                ->where('institution', 'TILD')
-                                ->first();
-                    } else {
-                        // Search institution
-                        $institution = Institution::where('code', Input::get('institution'))->first()->_id;
-                        // Search for user in institution
-                        $user = DB::table('users')
-                                ->where('username', $username)
-                                ->where('institution', $institution)
-                                ->first();
+                    // Search institution
+                    $institution = Institution::where('code', Input::get('institution'))->first();
+                    // Did we find the institution?
+                    if (empty($institution)) {
+                        return false;
                     }
+                    // Search for user
+                        $user = DB::table('users')
+                                ->where('username', $username)
+                                ->where('institution', $institution->_id)
+                                ->where('deleted_at','=',null)
+                                ->first();
                     // Did we find the user?
                     if (empty($user)) {
                         return false;
                     } else {
                         // Check user password
                         if(Hash::check($password, $user['password'])){
+                            // Update last access
+                            DB::table('users')
+                                ->where('username', $username)
+                                ->where('institution', $institution->_id)
+                                ->where('deleted_at','=',null)
+                                ->update(array(
+                                            'last_access' => new MongoDate(strtotime(date("d-m-Y H:i")))
+                                            ));
                             // Return user id
                             return $user['_id']->{'$id'};
                         } else {
