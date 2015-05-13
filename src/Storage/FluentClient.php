@@ -111,14 +111,14 @@ class FluentClient extends FluentAdapter implements ClientInterface
                    ->where('oauth_grants.id', $grantType);
         }
 
-        // hack to cast the array of results to stdClass
         $result = $query->first();
+
+        if (empty($result)) {
+            return null;
+        }
+        // hack to cast the array of results to stdClass
         if (!is_object($result)) {
             $result = (object) $result;
-        }
-
-        if (is_null($result)) {
-            return null;
         }
         
         return $this->hydrateEntity($result);
