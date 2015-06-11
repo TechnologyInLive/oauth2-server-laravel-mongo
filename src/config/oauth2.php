@@ -103,6 +103,7 @@ return [
                                 ->where('username', $username)
                                 ->where('institution', $institution->_id)
                                 ->where('deleted_at','=',null)
+                                ->where('status','=','active')
                                 ->update(array(
                                             'last_access' => new MongoDate(strtotime(date("d-m-Y H:i")))
                                         ));
