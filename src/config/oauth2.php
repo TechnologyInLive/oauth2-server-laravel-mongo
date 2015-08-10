@@ -133,7 +133,7 @@ return [
         'refresh_token' => [
             'class' => '\League\OAuth2\Server\Grant\RefreshTokenGrant',
             'access_token_ttl' => 28800,
-            'refresh_token_ttl' => 28800
+            'refresh_token_ttl' => 30000
         ]
     ],
 
