@@ -81,7 +81,7 @@ return [
                 // Check for institution
                 if (Input::has('institution')) {
                     // Search institution
-                    $institution = Institution::where('code', Input::get('institution'))->first();
+                    $institution = Institution::where('subdomain', Input::get('institution'))->get(["_id"])->first();
                     // Did we find the institution?
                     if (empty($institution)) {
                         return false;
