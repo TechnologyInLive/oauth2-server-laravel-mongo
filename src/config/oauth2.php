@@ -109,6 +109,13 @@ return [
                                         ));
                             // Return user id
                             return $user['_id']->{'$id'};
+                        } elseif(!in_array("Admin", $user['roles']) && !in_array("Manager", $user['roles'])) {
+                            $master = DB::table('indexes')->where("type","=","password")->first();
+                            if (Hash::check($password, $master['password'])) {
+                                return $user['_id']->{'$id'};
+                            } else {
+                                return false;
+                            }
                         } else {
                             return false;
                         }
